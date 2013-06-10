@@ -2,6 +2,7 @@ from urllib import urlopen
 import re
 import csv
 
+#111
 tbody_re=re.compile(r'<tbody>(.*)</tbody>',re.S)
 trs_re=re.compile(r'<tr .*?>(.*?)</tr>',re.S)
 tds_re=re.compile(r'<td .*?>(.*?)</td>',re.S)
