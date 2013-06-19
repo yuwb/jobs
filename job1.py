@@ -39,23 +39,30 @@ def _getAllPlays(teamurl):
 #3.get all game log messags for a player
 def _getBattingMessage(playerurl,playername):
     allmess={}
-    types=((1,5),(2,5),)
-    tr_re=re.compile(r'<tr class="rg.*?Row" id="DailDailyStats.*?>.*?</tr>',re.S)
+    types=('1','2','3','4','5','6','7','8','12','13','14','15')
+    typesbegin={'1':6, }
+    typesend={'13':2, }
+    tr_re=re.compile(r'<tr class="rg.*?Row" id="DailyStats.*?>.*?</tr>',re.S)
     td_re=re.compile(r'<td class="grid_line_.*?>(.*?)</td>',re.S)
+    date_re=re.compile(r'<a.*?>(.*?)</a>')
     for x in types:
-        url=playerurl+'&type='+x[0]+'&gds=&gde=&season=all' 
+        url=playerurl+'&type='+x+'&gds=&gde=&season=2012' 
         messages=_getmessages(url,tr_re)
         for message in messages:
             tds=td_re.findall(message)
-            allmess[tds[0]]=allmess.get(tds[0],[]).extend(tds[x[1]:])  
+            date=_convertdate(date_re.search(tds[0]).group(1))
+            allmess[date]=allmess.get(date,[playername,date,tds[1],tds[2]])
+            allmess[date].extend(tds[typesbegin.get(x,5):len(tds)-typesend.get(x,0)])  
 
 
     return allmess
 
 
 
+
+
 #4. get all play log messages for a player
-def _getPlaylogMessage(player):
+def _getPlaylogMessage(playerurl,playername):
 
     pass
 
