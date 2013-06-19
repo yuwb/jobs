@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*-
 from urllib import urlopen
 import re
 import csv
 
-#111234234234234sadfsadf345345345
 tbody_re=re.compile(r'<tbody>(.*)</tbody>',re.S)
 trs_re=re.compile(r'<tr .*?>(.*?)</tr>',re.S)
 tds_re=re.compile(r'<td .*?>(.*?)</td>',re.S)
@@ -14,6 +14,52 @@ lorR_re=re.compile(r'<strong>Bats/Throws:</strong>(.*?)<br',re.S)
 
 
 
+
+
+
+#get messages from a url and a re pattern
+def _getmessages(url,pattern):
+    doc = urlopen(url).read()
+    return pattern.findall(doc)
+
+
+#1.get all teams
+def _getAllTeams():
+    ALL_TEAM_URL='http://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=8&season=2013&month=0&season1=2013&ind=0&team=0,ts&players=0'
+    teamname_re=re.compile(r'<a href="(leaders.aspx\?pos=all.*?)">(.*?)</a>',re.S)
+    return _getmessages(ALL_TEAM_URL,teamname_re)[20:]
+
+
+
+#2.get all pays for a team
+def _getAllPlays(teamurl):
+    play_re=re.compile(r'<a href="(statss.aspx\?playerid=.*?">(.*?)</a>')
+    return _getmessages(teamurl,play_re) 
+
+#3.get all game log messags for a player
+def _getBattingMessage(playerurl,playername):
+    allmess={}
+    types=((1,5),(2,5),)
+    tr_re=re.compile(r'<tr class="rg.*?Row" id="DailDailyStats.*?>.*?</tr>',re.S)
+    td_re=re.compile(r'<td class="grid_line_.*?>(.*?)</td>',re.S)
+    for x in types:
+        url=playerurl+'&type='+x[0]+'&gds=&gde=&season=all' 
+        messages=_getmessages(url,tr_re)
+        for message in messages:
+            tds=td_re.findall(message)
+            allmess[tds[0]]=allmess.get(tds[0],[]).extend(tds[x[1]:])  
+
+
+    return allmess
+
+
+
+#4. get all play log messages for a player
+def _getPlaylogMessage(player):
+
+    pass
+
+#5.get 
 def _convertdate(datestr):
     date2=datestr.split('-')
     return ''.join((date2[1],date2[2],date2[0]))
